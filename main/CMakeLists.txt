@@ -1,4 +1,5 @@
 set(MAIN_SRCS
+	httplib.h
 	main.cpp
 )
 
