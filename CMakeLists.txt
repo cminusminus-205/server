@@ -5,10 +5,10 @@ project(server)
 # set(CMAKE_CXX_STANDARD 17)
 
 if(APPLE)
-	set(CMAKE_CXX_FLAGS "-std=c++11")
+	set(CMAKE_CXX_FLAGS "-std=c++14")
 else()
 	set(CMAKE_CXX_FLAGS "-std=c++17")
 endif()
 
 add_subdirectory(main)
-#add_subdirectory(dependencies)
+add_subdirectory(dependencies)

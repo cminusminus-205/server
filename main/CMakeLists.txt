@@ -1,6 +1,7 @@
 set(MAIN_SRCS
 	httplib.h
 	main.cpp
+	database.h
 )
 
 add_executable(
@@ -11,4 +12,5 @@ add_executable(
 target_link_libraries(
 	main
 	pthread
+	sqlite
 )
