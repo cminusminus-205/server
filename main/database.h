@@ -53,20 +53,18 @@ public:
 		Query* operation = operation_queue.front();
 		sqlite3_prepare_v2(db, operation -> SQL.c_str(), -1, &stmt, NULL);
 
-		for(int i=0; i<sqlite3_column_count(stmt); i++) {
-			output << sqlite3_column_name(stmt, i) << ",";
-		}
+		// for(int i=0; i<sqlite3_column_count(stmt); i++) {
+		// 	output << sqlite3_column_name(stmt, i) << ",";
+		// }
 
-		output << std::endl;
+		// output << std::endl;
 
 		while ( (rc = sqlite3_step(stmt)) == SQLITE_ROW) {  
 			for(int i=0; i<sqlite3_column_count(stmt); i++) {
 				const char* col = reinterpret_cast<const char*>(sqlite3_column_text(stmt, i));
-				output << (col ? std::string(col) : "NULL") << ", ";
+				output << (col ? std::string(col) : "NULL");
 				// output << (sqlite3_column_text(stmt, i) ? (std::string s(sqlite3_column_text(stmt, i))) : "NULL") << ",";
 			}
-
-			output << std::endl;
 		}
 
 		operation_queue.front() -> result = output.str();
