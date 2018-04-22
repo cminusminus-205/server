@@ -7,12 +7,12 @@
 #include <sstream>
 #include <iostream>
 #include <map>
+#include "json.hpp"
 
-enum {BUSY, DONE} status;
+using json = nlohmann::json;
 
 class Query;
 
-int sqlite_callback(void *NotUsed, int argc, char** argv, char** azColName);
 std::list<Query*> operation_queue;
 
 class Query {
@@ -23,15 +23,7 @@ public:
 	}
 	~Query() {}
 
-	void write_back(std::string row, bool done) {
-		if(done) {
-			finished = true;
-		} else {
-			// result.push_back(row);
-		}
-	}
-
-	std::string result;
+	std::list<json> result;
 
 	std::string SQL;
 	bool finished;
@@ -45,29 +37,42 @@ public:
 	~Database(){}
 
 	void execute_next(){
-		std::stringstream output;
+		//store our output as a list of rows, with each row being a json object
+		std::list<json> output;
 
+		//create the sql stmt we want to execute
 		sqlite3_stmt* stmt;
-		int rc;
 
 		Query* operation = operation_queue.front();
 		sqlite3_prepare_v2(db, operation -> SQL.c_str(), -1, &stmt, NULL);
 
-		// for(int i=0; i<sqlite3_column_count(stmt); i++) {
-		// 	output << sqlite3_column_name(stmt, i) << ",";
-		// }
+		while ( sqlite3_step(stmt) == SQLITE_ROW) {
+			//add a new row ot the list
+			
+			json row;
 
-		// output << std::endl;
-
-		while ( (rc = sqlite3_step(stmt)) == SQLITE_ROW) {  
 			for(int i=0; i<sqlite3_column_count(stmt); i++) {
-				const char* col = reinterpret_cast<const char*>(sqlite3_column_text(stmt, i));
-				output << (col ? std::string(col) : "NULL");
-				// output << (sqlite3_column_text(stmt, i) ? (std::string s(sqlite3_column_text(stmt, i))) : "NULL") << ",";
+				//get column name from statement:
+				const char* column_raw = sqlite3_column_name(stmt, i);
+				std::string column = std::string(column_raw);
+
+				//get column value from statement:
+				const char* value_raw = reinterpret_cast<const char*>(sqlite3_column_text(stmt, i));
+				std::string value = value_raw ? value_raw : "NULL";
+	
+				// update the row
+				row[column] = value;
+
 			}
+
+			// add the row to the list
+			output.push_back(row);
 		}
 
-		operation_queue.front() -> result = output.str();
+		//store the result
+		operation_queue.front() -> result = output;
+
+		//remove this query from the queue
 		if(!operation_queue.empty()) operation_queue.pop_front();	
 	}
 
@@ -80,19 +85,6 @@ public:
 		return this;
 	}
 };
-
-int sqlite_callback(void *NotUsed, int argc, char** argv, char** azColName){
-	std::cout << "called" << std::endl;
-	std::stringstream output;
-	for(int i = 0; i<argc; i++) {
-		output << azColName[i] << " = " << (argv[i] ? argv[i] : "NULL") << "\n";
-	}
-
-	operation_queue.front() -> write_back(output.str(), false);
-	if(!operation_queue.empty()) operation_queue.pop_front();
-
-	return 0;
-}
 
 
 #endif
