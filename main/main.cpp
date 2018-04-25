@@ -61,25 +61,36 @@ int main() {
 	app.post("/user/signup", [&](const auto& req, auto& res){
 		auto data = json::parse(req.body);
 
-		std::string username = data["username"];
-		std::string email = data["email"];
-		std::string password_hash = data["password_hash"];
+		std::string email;
+		std::string first_name; 
+		std::string last_name;
+		std::string password_hash;
+
+		try {
+			email = data["email"];
+			first_name = data["first_name"];
+			last_name = data["last_name"];
+			password_hash = data["password_hash"];
+			} catch(const nlohmann::detail::type_error e){
+				res.set_content("ERROR: invalid request", "text/plain");
+				return;
+			}
 
 		//Check to see if the user already exists
-		Query* check_if_exists = new Query("SELECT id FROM users WHERE username = \"" + username + "\"");
+		Query* check_if_exists = new Query("SELECT id FROM users WHERE email = \"" + email + "\"");
 		*db << check_if_exists;
 
-		if(check_if_exists -> result != "") {
-			res.set_content("username already exists", "text/plain");
-		} else {
-			Query* add_user = new Query("INSERT INTO users (username, email, password_hash) VALUES ( \"" + username + "\", \"" + email + "\", \"" + password_hash + "\"); ");
+		if(check_if_exists -> result.size() == 0) {
+			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\" \"" + password_hash + "\"); ");
 			*db << add_user;
 
 			res.set_content("added user", "text/plain");
+		} else {
+			res.set_content("email already registered", "text/plain");
 		}
-
-		// Query* query = new Query("INSERT INTO users")
 	});
+
+	//app.post("/")
 
 	app.get("/test", [](const Request& req, Response& res){
 		res.set_content("HelloWorld!", "text/plain");
