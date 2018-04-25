@@ -81,7 +81,7 @@ int main() {
 		*db << check_if_exists;
 
 		if(check_if_exists -> result.size() == 0) {
-			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\" \"" + password_hash + "\"); ");
+			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\", \"" + password_hash + "\"); ");
 			*db << add_user;
 
 			res.set_content("added user", "text/plain");
