@@ -8,7 +8,6 @@
 int main() {
 
 	using json = nlohmann::json;
-
 	using namespace httplib;
 
 	Server app;
@@ -36,21 +35,26 @@ int main() {
 
 		auto data = json::parse(req.body);
 
-		// extract username and password hash
-		std::string username = data["username"];
-		std::string password_hash = data["password_hash"];
+		try {
+			// extract username and password hash
+			std::string email = data["email"];
+			std::string password_hash = data["password_hash"];
 
-		// get user with this username from database
-		Query* query = new Query("SELECT password_hash FROM users WHERE username = \"" + username + "\";");
-		*db << query;
+			//get user with this username from database
+			Query* query = new Query("SELECT password_hash FROM users WHERE email = \"" + email + "\";");
+			*db << query;
 
-		// res.set_content(query -> result, "text/plain");
+			// res.set_content(query -> result, "text/plain");
 
-		// if the passwords match, let the user know they have logged in successfully
-		if(query -> result.size() > 0 && query -> result.front()["password_hash"] == password_hash) {
-			res.set_content("SUCCESS", "text/plain");
-		} else {
-			res.set_content("FAILURE", "text/plain");
+			// if the passwords match, let the user know they have logged in successfully
+			if(query -> result.size() > 0 && query -> result.front()["password_hash"] == password_hash) {
+				res.set_content("SUCCESS", "text/plain");
+			} else {
+				res.set_content("FAILURE", "text/plain");
+			}
+
+		} catch(const nlohmann::detail::type_error e) {
+			res.set_content("ERROR: invalid request", "text/plain");
 		}
 	});
 
