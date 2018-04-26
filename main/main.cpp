@@ -72,26 +72,36 @@ int main() {
 	});
 
 	app.post("/user/login", [&](const auto& req, auto& res){
-
-		auto data = json::parse(req.body);
+		json data;
 
 		try {
+			data = json::parse(req.body);
+		} catch (nlohmann::detail::parse_error e) {
+			res.set_content("ERROR: invalid request", "text/plain");
+			return;
+		}
+
+		try {
+			json reply;
+
 			// extract username and password hash
 			std::string email = data["email"];
 			std::string password_hash = data["password_hash"];
 
 			//get user with this username from database
-			Query* query = new Query("SELECT password_hash FROM users WHERE email = \"" + email + "\";");
+			Query* query = new Query("SELECT password_hash, privileges FROM users WHERE email = \"" + email + "\";");
 			*db << query;
-
-			// res.set_content(query -> result, "text/plain");
 
 			// if the passwords match, let the user know they have logged in successfully
 			if(query -> result.size() > 0 && query -> result.front()["password_hash"] == password_hash) {
-				res.set_content("SUCCESS", "text/plain");
+				reply["STATUS"] = "SUCCESS";
+				reply["PRIVILEGES"] = result.front()["privileges"];
 			} else {
-				res.set_content("FAILURE", "text/plain");
+				reply["STATUS"] = "FAILURE";
+				reply["ERROR_MSG"] = "Your email or password was incorrect";
 			}
+
+			res.set_content(reply.dump(), "application/json");
 
 		} catch(const nlohmann::detail::type_error e) {
 			res.set_content("ERROR: invalid request", "text/plain");
@@ -99,7 +109,14 @@ int main() {
 	});
 
 	app.post("/user/signup", [&](const auto& req, auto& res){
-		auto data = json::parse(req.body);
+		json data;
+
+		try{
+			data = json::parse(req.body);
+		} catch(nlohmann::detail::parse_error e) {
+			res.set_content("ERROR: invalid request", "text/plain");
+			return;
+		}
 
 		std::string email;
 		std::string first_name; 
