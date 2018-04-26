@@ -29,7 +29,7 @@ std::string get_privileges(httplib::Headers headers){
 		return "BAD REQUEST";
 
 	// Query the user database
-	Query* get_user_privileges = new Query("SELECT password_hash, privileges FROM users WHERE email = '" + auth_email + "';");
+	Query* get_user_privileges = new Query("SELECT password_hash,privileges FROM users WHERE email = '" + auth_email + "';");
 	*db << get_user_privileges;
 
 	if(get_user_privileges -> result.size() == 0) 
@@ -46,11 +46,19 @@ std::string get_privileges(httplib::Headers headers){
 
 int main() {
 	//open a connection to our database
-	Database* db = new Database("/Users/connorwiniarczyk/server/data.db");
+	db = new Database("/Users/connorwiniarczyk/server/data.db");
 
 	db -> wipe();
 
 	app.post("/data/execute", [&](const auto& req, auto& res){
+
+		std::string privileges = get_privileges(req.headers);
+
+		if(privileges != "GOD") {
+			res.set_content("ERROR: NOT AUTHORIZED", "text/plain");
+			return;
+		}
+
 		Query* query = new Query(req.body);
 		*db << query;
 

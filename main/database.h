@@ -19,35 +19,34 @@ class Query {
 public:
 	Query(std::string _SQL) {
 		SQL = _SQL;
-		finished = false;
 	}
 	~Query() {}
 
 	std::list<json> result;
 
 	std::string SQL;
-	bool finished;
 };
 
 class Database {
 public:
 	Database(std::string path){
 		int status = sqlite3_open(path.c_str(), &db);
+		std::cout << status;
 	}
 	~Database(){}
 
-	void execute_next(){
+	void execute(Query* operation){
 		//store our output as a list of rows, with each row being a json object
 		std::list<json> output;
 
 		//create the sql stmt we want to execute
 		sqlite3_stmt* stmt;
 
-		Query* operation = operation_queue.front();
+		// Query* operation = operation_queue.front();
 		sqlite3_prepare_v2(db, operation -> SQL.c_str(), -1, &stmt, NULL);
 
 		while ( sqlite3_step(stmt) == SQLITE_ROW) {
-			//add a new row ot the list
+			// add a new row ot the list
 			
 			json row;
 
@@ -69,11 +68,8 @@ public:
 			output.push_back(row);
 		}
 
-		//store the result
-		operation_queue.front() -> result = output;
-
-		//remove this query from the queue
-		if(!operation_queue.empty()) operation_queue.pop_front();	
+		// store the result
+		operation -> result = output;
 	}
 
 	// wipes the database
@@ -91,8 +87,8 @@ public:
 	char* error_message;
 
 	Database* operator<<(Query* operation) {
-		operation_queue.push_back(operation);
-		this -> execute_next();
+		// operation_queue.push_back(operation);
+		this -> execute(operation);
 		return this;
 	}
 };
