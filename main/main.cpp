@@ -95,7 +95,7 @@ int main() {
 			// if the passwords match, let the user know they have logged in successfully
 			if(query -> result.size() > 0 && query -> result.front()["password_hash"] == password_hash) {
 				reply["STATUS"] = "SUCCESS";
-				reply["PRIVILEGES"] = result.front()["privileges"];
+				reply["PRIVILEGES"] = query -> result.front()["privileges"];
 			} else {
 				reply["STATUS"] = "FAILURE";
 				reply["ERROR_MSG"] = "Your email or password was incorrect";
