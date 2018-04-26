@@ -3,6 +3,7 @@ set(MAIN_SRCS
 	main.cpp
 	database.h
 	json.hpp
+	endpoints/user.cpp
 )
 
 add_executable(

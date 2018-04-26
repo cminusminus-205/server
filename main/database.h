@@ -76,6 +76,17 @@ public:
 		if(!operation_queue.empty()) operation_queue.pop_front();	
 	}
 
+	// wipes the database
+	void wipe(){
+		*this << new Query("DROP TABLE IF EXISTS users;");
+		*this << new Query("DROP TABLE IF EXISTS emergencies;");
+		*this << new Query("CREATE TABLE users (id INTEGER UNIQUE PRIMARY KEY, first_name TEXT, last_name TEXT, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, privileges TEXT NOT NULL);");
+		*this << new Query("CREATE TABLE emergencies (id INTEGER UNIQUE PRIMARY KEY, type TEXT NOT NULL, latitude DOUBLE, longitude DOUBLE);");
+
+		// the database should always have a god user
+		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('god@user.com', 'god', 'password', 'GOD');");
+	}
+
 	sqlite3* db;
 	char* error_message;
 
