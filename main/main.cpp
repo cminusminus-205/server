@@ -46,7 +46,7 @@ std::string get_privileges(httplib::Headers headers){
 
 int main() {
 	//open a connection to our database
-	db = new Database("/Users/connorwiniarczyk/server/data.db");
+	db = new Database("/root/server/data.db");
 
 	db -> wipe();
 
@@ -121,7 +121,7 @@ int main() {
 		*db << check_if_exists;
 
 		if(check_if_exists -> result.size() == 0) {
-			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\", \"" + password_hash + "\"); ");
+			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash, priveleges) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\", \"" + password_hash + "\", 'PUBLIC'); ");
 			*db << add_user;
 
 			res.set_content("added user", "text/plain");
