@@ -46,7 +46,7 @@ std::string get_privileges(httplib::Headers headers){
 
 int main() {
 	//open a connection to our database
-	db = new Database("/root/server/data.db");
+	db = new Database("/Users/connorwiniarczyk/server/data.db");
 
 	db -> wipe();
 
@@ -181,22 +181,18 @@ int main() {
 	// submits an emergency report, it will need to be verified
 	app.post("/emergency/report", [&](const auto& req, auto& res){
 		json data;
+		json reply;
 
-		std::for_each(req.headers.begin(), req.headers.end(), [&](auto& pair){
+		if(!(		get_privileges(req.headers) == "PUBLIC" 
+			||	get_privileges(req.headers) == "FIRST RESPONDER" 
+			||	get_privileges(req.headers) == "CONTROL CENTER"
+			||	get_privileges(req.headers) == "GOD")) {
 
-			std::stringstream output;
-			output << pair.first;
-
-			const std::string str = output.str();
-
-			res.set_content(str, "text/plain");
-
+			reply["STATUS"] = "FAILURE";
+			reply["ERROR_MSG"] = "You are not authorized to do that";
+			res.set_content(reply.dump(), "application/json");
 			return;
-		});
-
-		// res.set_content(req.headers["username"], "text/plain");
-
-		return;
+		}
 
 		try {
 			data = json::parse(req.body);
@@ -206,41 +202,42 @@ int main() {
 
 		std::string type;
 		std::string description;
-		double latitude;
-		double longitude;
+		std::string latitude = "";
+		std::string longitude = "";
 
 		// get latitude and longitude data
 		try {
-			// latitude = data["location"]["latitude"];
-			// longitude = data["location"]["longitude"];
-		} catch (nlohmann::detail::parse_error e) {
-			latitude = NAN;
-			longitude = NAN;
+			latitude = data["location"]["latitude"];
+			longitude = data["location"]["longitude"];
+		} catch (std::exception e) {
+			latitude = "";
+			longitude = "";
 		}
 
 		// get type and description data
 		try {
-			// type = data["type"];
-			// description = data["description"];
-		} catch (nlohmann::detail::parse_error e) {
-			res.set_content("ERROR: INCOMPLETE INFORMATION", "text/plain");
+			type = data["type"];
+			description = data["description"];
+		} catch (std::exception e) {
+			reply["STATUS"] = "ERROR";
+			reply["ERROR_MSG"] = "Invalid request";
+			res.set_content(reply.dump(), "application/json");
 			return;
 		}
 
 		Query* submit_report;
 
-		if(latitude == NAN || longitude == NAN){
-			submit_report = new Query("INSERT INTO emergencies (type, description, status) VALUES ('" + type + "', '" + description + "', '" + "UNVERIFIED" + "');");
+		if(latitude == "" || longitude == ""){
+			submit_report = new Query("INSERT INTO reports (type, description, status) VALUES (\"" + type + "\", \"" + description + "\", \"UNVERIFIED\");");
 		} else {
-			submit_report = new 	Query("INSERT INTO emergencies (type, description, status, latitude, longitude)"
-									+ std::string("VALUES ('" + type + "', '" + description + "', '" + "UNVERIFIED" + "', ") 
-									+ std::to_string(latitude) + ", " + std::to_string(longitude) + ");");
+			submit_report = new 	Query("INSERT INTO reports (type, description, status, latitude, longitude)"
+									+ std::string("VALUES ('" + type + "', '" + description + "', '" + "UNVERIFIED" + "', '") 
+									+ latitude + "', '" + longitude + "'');");
 		}
 
 		*db << submit_report;
-		// json j_vec(submit_report -> result);
 
-		res.set_content("Submited report", "/text/plain");
+		res.set_content("Submitted report", "/text/plain");
 	});
 
 	app.post("/emergency/info", [&](const auto& req, auto& res){
