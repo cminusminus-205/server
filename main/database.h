@@ -82,8 +82,8 @@ public:
 		*this << new Query("DROP TABLE IF EXISTS reports;");
 
 		*this << new Query("CREATE TABLE users (id INTEGER UNIQUE PRIMARY KEY, first_name TEXT, last_name TEXT, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, privileges TEXT NOT NULL, phone TEXT, workAd TEXT, homeAd TEXT, workZip INTEGER, homeZip INTEGER, workType TEXT, workStation TEXT, stationZip INTEGER, verify INTEGER, identity INTEGER);");
-		*this << new Query("CREATE TABLE emergencies (id INTEGER UNIQUE PRIMARY KEY, type TEXT NOT NULL, latitude TEXT, longitude TEXT, status TEXT NOT NULL, description TEXT NOT NULL);");
-		*this << new Query("CREATE TABLE reports (id INTEGER UNIQUE PRIMARY KEY,  type TEXT NOT NULL, latitude TEXT, longitude TEXT, description TEXT NOT NULL, status TEXT NOT NULL, time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, sent_by INTEGER );");
+		*this << new Query("CREATE TABLE emergencies (id INTEGER UNIQUE PRIMARY KEY, type TEXT NOT NULL, latitude TEXT, longitude TEXT, status TEXT NOT NULL, description TEXT NOT NULL, time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);");
+		*this << new Query("CREATE TABLE reports (id INTEGER UNIQUE PRIMARY KEY,  type TEXT NOT NULL, latitude TEXT, longitude TEXT, description TEXT NOT NULL, status TEXT NOT NULL, time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, sent_by TEXT, sent_by_type TEXT );");
 
 		// the database should always have a god user
 		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('god@user.com', 'god', 'password', 'GOD');");
