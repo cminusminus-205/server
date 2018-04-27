@@ -316,6 +316,9 @@ int main() {
 
 			// add report to emergency
 			Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES (\"" + type + "\", \"" + latitude + "\", \"" + longitude + "\", \"ACTIVE\", \"" + description + "\")");
+			res.set_content(add_emergency->SQL, "text/plain");
+
+			return;
 			*db << add_emergency;
 		}
 
