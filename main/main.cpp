@@ -237,7 +237,9 @@ int main() {
 
 		*db << submit_report;
 
-		res.set_content("Submitted report", "/text/plain");
+		reply["STATUS"] = "SUCCESS";
+
+		res.set_content(reply.dump(), "application/json");
 	});
 
 	app.get("/emergency/unverified", [&](const auto& req, auto& res){
