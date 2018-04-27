@@ -290,6 +290,14 @@ int main() {
 		*db << get_report;
 		json report = get_report -> result;
 
+		if(action == "DENY") {
+			Query* deny_report = new Query("UPDATE reports SET status = \"DENIED\" WHERE id = " + std::to_string(id) + ";");
+			*db << deny_report;
+			reply["STATUS"] = "SUCCESS";
+		}
+
+		res.set_content(reply.dump(), "application/json");
+
 		// add_emergency();
 	});
 
