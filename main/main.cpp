@@ -45,8 +45,8 @@ std::string get_privileges(httplib::Headers headers){
 }
 
 void add_emergency(json data){
-	Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description)" 
-		+ "VALUES ('" + data["type"] + "', '" + data["latitude"] + "', '" + + "', '" + + "', '" + + "');");
+	// Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description)" 
+		// + "VALUES ('" + data["type"] + "', '" + data["latitude"] + "', '" + + "', '" + + "', '" + + "');");
 }
 
 int main() {
