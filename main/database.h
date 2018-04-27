@@ -89,8 +89,7 @@ public:
 		// the database should always have a god user
 		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('god@user.com', 'god', 'password', 'GOD');");
 		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('test@test.com', 'public', 'password', 'PUBLIC');");
-		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('firstresponder@test.com', 'first', 'password', 'FIRST RESPONDER
-			');");
+		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('firstresponder@test.com', 'first', 'password', 'FIRST RESPONDER');");
 
 	}
 
