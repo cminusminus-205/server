@@ -296,10 +296,23 @@ int main() {
 			*db << permit_report;
 			reply["STATUS"] = "SUCCESS";
 
-			std::string type = report["type"];
-			std::string latitude = report["latitude"];
-			std::string longitude = report["longitude"];
-			std::string description = report["description"];
+			std::string type;
+			std::string latitude;
+			std::string longitude;
+			std::string description;
+
+			try {
+				type = report["type"];
+				latitude = report["latitude"];
+				longitude = report["longitude"];
+				description = report["description"];
+			} catch (std::exception e) {
+				reply["STATUS"] = "FAILURE";
+				reply["ERROR_MSG"] = "Inavlid request";
+				res.set_content(reply.dump(), "application/json");
+
+				return;
+			}
 
 			// add report to emergency
 			Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES (\"" + type + "\", \"" + latitude + "\", \"" + longitude + "\", \"ACTIVE\", \"" + description + "\")");
