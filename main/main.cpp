@@ -44,9 +44,7 @@ std::string get_privileges(httplib::Headers headers){
 
 }
 
-void add_emergency(json data){
-	
-}
+void add_emergency(json data){}
 
 int main() {
 	//open a connection to our database
@@ -293,7 +291,7 @@ int main() {
 		*db << get_report;
 		json report = get_report -> result;
 
-		add_emergency();
+		// add_emergency();
 	});
 
 	app.post("/emergency/info", [&](const auto& req, auto& res){
