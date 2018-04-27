@@ -44,7 +44,10 @@ std::string get_privileges(httplib::Headers headers){
 
 }
 
-void add_emergency(json data){}
+void add_emergency(json data){
+	Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description)" 
+		+ "VALUES ('" + data["type"] + "', '" + data["latitude"] + "', '" + + "', '" + + "', '" + + "');");
+}
 
 int main() {
 	//open a connection to our database
@@ -163,7 +166,7 @@ int main() {
 	});
 
 	//list the current emergencies, possibly with a given selector
-	app.post("/emergency/list", [&](const auto& req, auto& res){
+	app.get("/emergency/list", [&](const auto& req, auto& res){
 		Query* get_emergencies = new Query("SELECT * FROM emergencies;");
 		*db << get_emergencies;
 		json j_vec(get_emergencies -> result);
