@@ -267,7 +267,7 @@ int main() {
 		json data;
 		json reply;
 
-		int id;
+		std::string id;
 		std::string action;
 
 		// make sure the user is authorized
