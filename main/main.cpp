@@ -46,7 +46,7 @@ std::string get_privileges(httplib::Headers headers){
 
 int main() {
 	//open a connection to our database
-	db = new Database("/Users/connorwiniarczyk/server/data.db");
+	db = new Database("/root/server/data.db");
 
 	db -> wipe();
 
@@ -231,8 +231,8 @@ int main() {
 			submit_report = new Query("INSERT INTO reports (type, description, status) VALUES (\"" + type + "\", \"" + description + "\", \"UNVERIFIED\");");
 		} else {
 			submit_report = new 	Query("INSERT INTO reports (type, description, status, latitude, longitude)"
-									+ std::string("VALUES ('" + type + "', '" + description + "', '" + "UNVERIFIED" + "', '") 
-									+ latitude + "', '" + longitude + "'');");
+									+ std::string("VALUES (\"" + type + "\", \"" + description + "\", \"" + "UNVERIFIED" + "\", \"") 
+									+ latitude + "\", \"" + longitude + "\");");
 		}
 
 		*db << submit_report;

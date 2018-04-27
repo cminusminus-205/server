@@ -80,7 +80,7 @@ public:
 	void wipe(){
 		*this << new Query("DROP TABLE IF EXISTS users;");
 		*this << new Query("DROP TABLE IF EXISTS emergencies;");
-		*this << new Query("DROP TABLE IF EXISTS reports");
+		*this << new Query("DROP TABLE IF EXISTS reports;");
 
 		*this << new Query("CREATE TABLE users (id INTEGER UNIQUE PRIMARY KEY, first_name TEXT, last_name TEXT, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, privileges TEXT NOT NULL, phone TEXT, workAd TEXT, homeAd TEXT, workZip INTEGER, homeZip INTEGER, workType TEXT, workStation TEXT, stationZip INTEGER, verify INTEGER, identity INTEGER);");
 		*this << new Query("CREATE TABLE emergencies (id INTEGER UNIQUE PRIMARY KEY, type TEXT NOT NULL, latitude TEXT, longitude TEXT, status TEXT NOT NULL, description TEXT NOT NULL);");
@@ -89,7 +89,8 @@ public:
 		// the database should always have a god user
 		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('god@user.com', 'god', 'password', 'GOD');");
 		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('test@test.com', 'public', 'password', 'PUBLIC');");
-		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('firstresponder@test.com', 'first', 'password', 'FIRST RESPONDER');");
+		*this << new Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('firstresponder@test.com', 'first', 'password', 'FIRST RESPONDER
+			');");
 
 	}
 
