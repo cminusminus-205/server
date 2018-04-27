@@ -302,7 +302,7 @@ int main() {
 			std::string longitude;
 			std::string description;
 
-x			// res.set_content(report.dump(), "application/json");
+			// res.set_content(report.dump(), "application/json");
 
 			try {
 				type = report["type"];
