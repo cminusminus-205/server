@@ -243,8 +243,13 @@ int main() {
 
 		//make sure the user is authorized to view this information
 		if(!(get_privileges(req.headers) == "GOD" || get_privileges(req.headers) == "CONTROL CENTER")) {
-			reply["STATUS"] = "FALIURE";
-			reply["ERROR_MSG"] = "You are not authorized";
+			json error_message;
+
+			error_message["STATUS"] = "FALIURE";
+			error_message["ERROR_MSG"] = "You are not authorized";
+
+			reply[0] = error_message;
+
 			res.set_content(reply.dump(), "application/json");
 			return;
 		}
