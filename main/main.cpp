@@ -44,6 +44,10 @@ std::string get_privileges(httplib::Headers headers){
 
 }
 
+void add_emergency(json data){
+	
+}
+
 int main() {
 	//open a connection to our database
 	db = new Database("/root/server/data.db");
@@ -254,12 +258,42 @@ int main() {
 		}
 
 		// if the user is authorized, proceed with the data
-		Query* get_reports = new Query("SELECT * FROM reports WHERE status = \"UNVERIFIED\";");
+		Query* get_reports = new Query("SELECT * FROM reports WHERE status = \"UNVERIFIED\" ORDER BY time;");
 		*db << get_reports;
 
 		reply = get_reports -> result;
 
 		res.set_content(reply.dump(), "application/json");
+	});
+
+	app.post("/emergency/verify", [&](const auto& req, auto& res){
+		json data;
+		json reply;
+
+		int id;
+		std::string action;
+
+		// make sure the user is authorized
+		if(!(get_privileges(req.headers) == "GOD" || get_privileges(req.headers) == "CONTROL CENTER")) {
+			reply["STATUS"] = "FAILURE";
+			reply["ERROR_MSG"] = "You are not authorized";
+			return;
+		}
+
+		try {
+			id = data["id"];
+			action = data["action"];
+		} catch(std::exception e) {
+			reply["STATUS"] = "FAILURE";
+			reply["ERROR_MSG"] = "Invalid request";
+			return;
+		}
+
+		Query* get_report = new Query("SELECT * FROM reports WHERE id=" + std::to_string(id) + ";");
+		*db << get_report;
+		json report = get_report -> result;
+
+		add_emergency();
 	});
 
 	app.post("/emergency/info", [&](const auto& req, auto& res){
