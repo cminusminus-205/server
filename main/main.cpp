@@ -164,20 +164,11 @@ int main() {
 
 	//list the current emergencies, possibly with a given selector
 	app.post("/emergency/list", [&](const auto& req, auto& res){
-		std::string selector = req.body;
-		Query* get_emergencies;
-
-
-		if(selector == "") {
-			get_emergencies = new Query("SELECT * FROM emergencies;");
-		} else {
-			get_emergencies = new Query("SELECT * FROM emergencies WHERE \"" + selector + ";");
-		}
-
+		Query* get_emergencies = new Query("SELECT * FROM emergencies;");
 		*db << get_emergencies;
-
 		json j_vec(get_emergencies -> result);
-		res.set_content(j_vec.dump(), "text/plain");
+		
+		res.set_content(j_vec.dump(), "application/json");
 	});
 
 	// submits an emergency report, it will need to be verified
