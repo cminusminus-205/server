@@ -207,8 +207,8 @@ int main() {
 
 		// get latitude and longitude data
 		try {
-			latitude = data["location"]["latitude"];
-			longitude = data["location"]["longitude"];
+			latitude = data["latitude"];
+			longitude = data["longitude"];
 		} catch (std::exception e) {
 			latitude = "";
 			longitude = "";
