@@ -287,12 +287,12 @@ int main() {
 			return;
 		}
 
-		Query* get_report = new Query("SELECT * FROM reports WHERE id=" + std::to_string(id) + ";");
+		Query* get_report = new Query("SELECT * FROM reports WHERE id=" + id + ";");
 		*db << get_report;
 		json report = get_report -> result;
 
 		if(action == "DENY") {
-			Query* deny_report = new Query("UPDATE reports SET status = \"DENIED\" WHERE id = " + std::to_string(id) + ";");
+			Query* deny_report = new Query("UPDATE reports SET status = \"DENIED\" WHERE id = " + id + ";");
 			*db << deny_report;
 			reply["STATUS"] = "SUCCESS";
 		}
