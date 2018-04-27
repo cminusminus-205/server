@@ -286,7 +286,7 @@ int main() {
 
 		Query* get_report = new Query("SELECT * FROM reports WHERE id=" + id + ";");
 		*db << get_report;
-		json report = get_report -> result;
+		json report = get_report -> result[0];
 
 		if(action == "DENY") {
 			Query* deny_report = new Query("UPDATE reports SET status = \"DENIED\" WHERE id = " + id + ";");
@@ -302,8 +302,7 @@ int main() {
 			std::string longitude;
 			std::string description;
 
-			res.set_content(report.dump(), "application/json");
-			return;
+			// res.set_content(report.dump(), "application/json");
 
 			try {
 				type = report["type"];
