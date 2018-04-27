@@ -278,6 +278,7 @@ int main() {
 		}
 
 		try {
+			data = json::parse(req.body);
 			id = data["id"];
 			action = data["action"];
 		} catch(std::exception e) {
