@@ -269,6 +269,7 @@ int main() {
 		if(!(get_privileges(req.headers) == "GOD" || get_privileges(req.headers) == "CONTROL CENTER")) {
 			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "You are not authorized";
+			res.set_content(reply.dump(), "application/json");
 			return;
 		}
 
