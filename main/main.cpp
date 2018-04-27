@@ -283,6 +283,7 @@ int main() {
 		} catch(std::exception e) {
 			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "Invalid request";
+			res.set_content(reply.dump(), "application/json");
 			return;
 		}
 
