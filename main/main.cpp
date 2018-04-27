@@ -245,7 +245,7 @@ int main() {
 		if(!(get_privileges(req.headers) == "GOD" || get_privileges(req.headers) == "CONTROL CENTER")) {
 			json error_message;
 
-			error_message["STATUS"] = "FALIURE";
+			error_message["STATUS"] = "FAILURE";
 			error_message["ERROR_MSG"] = "You are not authorized";
 
 			reply[0] = error_message;
