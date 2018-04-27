@@ -301,6 +301,8 @@ int main() {
 			std::string longitude;
 			std::string description;
 
+			res.set_content(report.dump(), "application/json");
+
 			try {
 				type = report["type"];
 				latitude = report["latitude"];
