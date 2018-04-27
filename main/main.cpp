@@ -29,7 +29,7 @@ std::string get_privileges(httplib::Headers headers){
 		return "BAD REQUEST";
 
 	// Query the user database
-	Query* get_user_privileges = new Query("SELECT password_hash,privileges FROM users WHERE email = '" + auth_email + "';");
+	Query* get_user_privileges = new Query("SELECT password_hash,privileges FROM users WHERE email = \"" + auth_email + "\";");
 	*db << get_user_privileges;
 
 	if(get_user_privileges -> result.size() == 0) 
@@ -42,11 +42,6 @@ std::string get_privileges(httplib::Headers headers){
 	// finally, return the privileges
 	return get_user_privileges -> result.front()["privileges"];
 
-}
-
-void add_emergency(json data){
-	// Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description)" 
-		// + "VALUES ('" + data["type"] + "', '" + data["latitude"] + "', '" + + "', '" + + "', '" + + "');");
 }
 
 int main() {
@@ -143,7 +138,7 @@ int main() {
 		*db << check_if_exists;
 
 		if(check_if_exists -> result.size() == 0) {
-			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\", \"" + password_hash + "\", 'PUBLIC'); ");
+			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\", \"" + password_hash + "\", \"PUBLIC\"); ");
 			*db << add_user;
 
 			res.set_content("added user", "text/plain");
@@ -296,6 +291,19 @@ int main() {
 			Query* deny_report = new Query("UPDATE reports SET status = \"DENIED\" WHERE id = " + id + ";");
 			*db << deny_report;
 			reply["STATUS"] = "SUCCESS";
+		} else if(action == "PERMIT") {
+			Query* permit_report = new Query("UPDATE reports SET status = \"PERMITTED\" WHERE id = " + id + ";");
+			*db << permit_report;
+			reply["STATUS"] = "SUCCESS";
+
+			std::string type = report["type"];
+			std::string latitude = report["latitude"];
+			std::string longitude = report["longitude"];
+			std::string description = report["description"];
+
+			// add report to emergency
+			Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES (\"" + type + "\", \"" + latitude + "\", \"" + longitude + "\", \"ACTIVE\", \"" + description + "\")");
+			*db << add_emergency;
 		}
 
 		res.set_content(reply.dump(), "application/json");
