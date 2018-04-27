@@ -167,7 +167,7 @@ int main() {
 
 	//list the current emergencies, possibly with a given selector
 	app.get("/emergency/list", [&](const auto& req, auto& res){
-		Query* get_emergencies = new Query("SELECT * FROM emergencies;");
+		Query* get_emergencies = new Query("SELECT * FROM emergencies ORDER BY id DESC;");
 		*db << get_emergencies;
 		json j_vec(get_emergencies -> result);
 		
