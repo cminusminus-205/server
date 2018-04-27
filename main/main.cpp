@@ -219,7 +219,7 @@ int main() {
 			type = data["type"];
 			description = data["description"];
 		} catch (std::exception e) {
-			reply["STATUS"] = "ERROR";
+			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "Invalid request";
 			res.set_content(reply.dump(), "application/json");
 			return;
@@ -238,6 +238,26 @@ int main() {
 		*db << submit_report;
 
 		res.set_content("Submitted report", "/text/plain");
+	});
+
+	app.get("/emergency/unverified", [&](const auto& req, auto& res){
+		json reply;
+
+		//make sure the user is authorized to view this information
+		if(!(get_privileges(req.headers) == "GOD" || get_privileges(req.headers) == "CONTROL CENTER")) {
+			reply["STATUS"] = "FALIURE";
+			reply["ERROR_MSG"] = "You are not authorized";
+			res.set_content(reply.dump(), "application/json");
+			return;
+		}
+
+		// if the user is authorized, proceed with the data
+		Query* get_reports = new Query("SELECT * FROM reports WHERE status = \"UNVERIFIED\";");
+		*db << get_reports;
+
+		reply = get_reports -> result;
+
+		res.set_content(reply.dump(), "application/json");
 	});
 
 	app.post("/emergency/info", [&](const auto& req, auto& res){
