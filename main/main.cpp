@@ -303,6 +303,7 @@ int main() {
 			std::string description;
 
 			res.set_content(report.dump(), "application/json");
+			return;
 
 			try {
 				type = report["type"];
