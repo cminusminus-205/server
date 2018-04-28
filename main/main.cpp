@@ -331,6 +331,30 @@ int main() {
 		auto data = json::parse(req.body);
 	});
 
+	app.get("/chat/get", [&](const auto& req, auto& res){
+		json reply;
+		if(!(		get_privileges(req.headers) == "GOD"
+			||	get_privileges(req.headers) == "CONTROL CENTER"
+			||	get_privileges(req.headers) == "FIRST RESPONDER")){
+
+			reply["STATUS"] = "FAILURE";
+			reply["ERROR_MSG"] = "You are not authorized";
+			res.set_content(reply.dump(), "application/json");
+			return;
+		}
+
+		Query* get_chat = new Query("SELECT * FROM chat;");
+		*db << get_chat;
+
+		json j_vec(get_chat -> result);
+
+		res.set_content(j_vec.dump(), "/application/json");
+	});
+
+	app.post("/chat/post", [&](const auto& req, auto& res){
+
+	});
+
 	// app.post("/emergency/")
 
 	app.get("/test", [](const Request& req, Response& res){
