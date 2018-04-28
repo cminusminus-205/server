@@ -388,6 +388,9 @@ int main() {
 
 			email = get_email(req.headers);
 			message = data["message"];
+
+			res.set_content(email + " " + message, "text/plain");
+			return;
 		} catch (std::exception e) {
 			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "Invalid request";
