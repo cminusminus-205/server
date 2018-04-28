@@ -388,9 +388,6 @@ int main() {
 
 			email = get_email(req.headers);
 			message = data["message"];
-
-			res.set_content(email + " " + message, "text/plain");
-			return;
 		} catch (std::exception e) {
 			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "Invalid request";
@@ -398,7 +395,7 @@ int main() {
 			return;
 		}
 
-		Query* post_message = new Query("INSRT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\");");
+		Query* post_message = new Query("INSERT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\");");
 		*db << post_message;
 
 		reply["STATUS"] = "SUCCESS";
