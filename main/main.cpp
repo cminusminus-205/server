@@ -354,7 +354,7 @@ int main() {
 
 			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "You are not authorized";
-			res.set_content(reply.dump(), "application/json");
+			res.set_content("[" + reply.dump() + "]", "application/json");
 			return;
 		}
 
@@ -396,7 +396,7 @@ int main() {
 			return;
 		}
 
-		Query* post_message = new Query("INSERT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\");");
+		Query* post_message = new Query("INSERT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\"); ORDER BY ");
 		*db << post_message;
 
 		reply["STATUS"] = "SUCCESS";
