@@ -374,7 +374,7 @@ int main() {
 
 			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "You are not authorized";
-			res.set_content(reply.dump(), "application/json");
+			res.set_content("[" + reply.dump() + "]", "application/json");
 			return;
 		}
 
@@ -391,7 +391,8 @@ int main() {
 		} catch (std::exception e) {
 			reply["STATUS"] = "FAILURE";
 			reply["ERROR_MSG"] = "Invalid request";
-			res.set_content(reply.dump(), "application/json");
+
+			res.set_content("[" + reply.dump() + "]", "application/json");
 			return;
 		}
 
