@@ -12,6 +12,21 @@ using namespace httplib;
 Server app;
 Database* db;
 
+
+std::string get_email(httplib::Headers headers){
+	std::string email = "";
+
+	try {
+		std::for_each(headers.begin(), headers.end(), [&](auto& pair){
+			if(pair.first == "email")	email = pair.second;
+		});
+	} catch(std::exception e) {
+		email = "";
+	}
+
+	return email;
+}
+
 std::string get_privileges(httplib::Headers headers){
 	std::string auth_email = "";
 	std::string auth_password_hash = "";
@@ -352,6 +367,39 @@ int main() {
 	});
 
 	app.post("/chat/post", [&](const auto& req, auto& res){
+		json reply;
+		if(!(		get_privileges(req.headers) == "GOD"
+			||	get_privileges(req.headers) == "CONTROL CENTER"
+			||	get_privileges(req.headers) == "FIRST RESPONDER")){
+
+			reply["STATUS"] = "FAILURE";
+			reply["ERROR_MSG"] = "You are not authorized";
+			res.set_content(reply.dump(), "application/json");
+			return;
+		}
+
+		json data;
+
+		std::string email;
+		std::string message;
+
+		try {
+			data = json::parse(req.body);
+
+			email = get_email(req.headers);
+			message = data["message"];
+		} catch (std::exception e) {
+			reply["STATUS"] = "FAILURE";
+			reply["ERROR_MSG"] = "Invalid request";
+			res.set_content(reply.dump(), "application/json");
+			return;
+		}
+
+		Query* post_message = new Query("INSRT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\");");
+		*db << post_message;
+
+		reply["STATUS"] = "SUCCESS";
+		res.set_content(reply.dump(), "application/json");
 
 	});
 
