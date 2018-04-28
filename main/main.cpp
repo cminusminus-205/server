@@ -358,7 +358,7 @@ int main() {
 			return;
 		}
 
-		Query* get_chat = new Query("SELECT * FROM chat;");
+		Query* get_chat = new Query("SELECT * FROM chat ORDER BY time DESC;");
 		*db << get_chat;
 
 		json j_vec(get_chat -> result);
