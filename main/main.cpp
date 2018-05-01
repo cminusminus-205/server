@@ -189,7 +189,7 @@ int main() {
 		
 		res.set_content(j_vec.dump(), "application/json");
 
-		delete(get_emergencies);
+		// delete(get_emergencies);
 	});
 
 	// submits an emergency report, it will need to be verified
