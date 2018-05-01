@@ -55,7 +55,9 @@ std::string get_privileges(httplib::Headers headers){
 		return "AUTH FAILED: INCORRECT PASSWORD";
 
 	// finally, return the privileges
-	return get_user_privileges -> result.front()["privileges"];
+	std::string output = get_user_privileges -> result.front()["privileges"];
+	delete(get_user_privileges);
+	return output;
 
 }
 

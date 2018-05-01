@@ -74,9 +74,7 @@ public:
 
 		//remove this query from the queue
 		if(!operation_queue.empty()) {
-			Query* operation = operation_queue.front();
 			operation_queue.pop_front();
-			delete(operation);
 		}
 	}
 
