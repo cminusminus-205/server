@@ -44,21 +44,19 @@ std::string get_privileges(httplib::Headers headers){
 		return "BAD REQUEST";
 
 	// Query the user database
-	Query* get_user_privileges = new Query("SELECT password_hash,privileges FROM users WHERE email = \"" + auth_email + "\";");
-	*db << get_user_privileges;
+	Query get_user_privileges = Query("SELECT password_hash,privileges FROM users WHERE email = \"" + auth_email + "\";");
+	auto result = *db << get_user_privileges;
 
-	if(get_user_privileges -> result.size() == 0) 
+	if(result.size() == 0) 
 		return "AUTH FAILED: NOT A USER";
 
 	// next, check to make sure the password match
-	if(get_user_privileges -> result.front()["password_hash"] != auth_password_hash)
+	if(result.front()["password_hash"] != auth_password_hash)
 		return "AUTH FAILED: INCORRECT PASSWORD";
 
 	// finally, return the privileges
-	std::string output = get_user_privileges -> result.front()["privileges"];
-	delete(get_user_privileges);
+	std::string output = result.front()["privileges"];
 	return output;
-
 }
 
 int main() {
@@ -76,14 +74,9 @@ int main() {
 			return;
 		}
 
-		Query* query = new Query(req.body);
-		*db << query;
-
-		json j_vec(query -> result);
-
+		json j_vec(*db << Query(req.body));
 		res.set_content(j_vec.dump(4), "text/plain");
 
-		delete(query);
 	});
 
 	app.post("/user/login", [&](const auto& req, auto& res){
@@ -104,13 +97,12 @@ int main() {
 			std::string password_hash = data["password_hash"];
 
 			//get user with this username from database
-			Query* query = new Query("SELECT password_hash, privileges FROM users WHERE email = \"" + email + "\";");
-			*db << query;
+			std::list<json> result = *db << Query("SELECT password_hash, privileges FROM users WHERE email = \"" + email + "\";");
 
 			// if the passwords match, let the user know they have logged in successfully
-			if(query -> result.size() > 0 && query -> result.front()["password_hash"] == password_hash) {
+			if(result.size() > 0 && result.front()["password_hash"] == password_hash) {
 				reply["STATUS"] = "SUCCESS";
-				reply["PRIVILEGES"] = query -> result.front()["privileges"];
+				reply["PRIVILEGES"] = result.front()["privileges"];
 			} else {
 				reply["STATUS"] = "FAILURE";
 				reply["ERROR_MSG"] = "Your email or password was incorrect";
@@ -118,7 +110,6 @@ int main() {
 
 			res.set_content(reply.dump(), "application/json");
 
-			delete(query);
 
 		} catch(const nlohmann::detail::type_error e) {
 			res.set_content("ERROR: invalid request", "text/plain");
@@ -151,45 +142,33 @@ int main() {
 			}
 
 		//Check to see if the user already exists
-		Query* check_if_exists = new Query("SELECT id FROM users WHERE email = \"" + email + "\"");
-		*db << check_if_exists;
+		std::list<json> result = *db << Query("SELECT id FROM users WHERE email = \"" + email + "\"");
 
-		if(check_if_exists -> result.size() == 0) {
-			Query* add_user = new Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\", \"" + password_hash + "\", \"PUBLIC\"); ");
-			*db << add_user;
-
+		if(result.size() == 0) {
+			*db << Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ( \"" + email + "\", \"" + first_name + "\", \"" + last_name + "\", \"" + password_hash + "\", \"PUBLIC\"); ");
 			res.set_content("added user", "text/plain");
 		} else {
 			res.set_content("email already registered", "text/plain");
 		}
 
-		delete(check_if_exists);
 	});
 
 	// fetches info on the user with the given email and returns it
 	app.post("/user/info", [&](const auto& req, auto& res){
-		Query* get_user = new Query("SELECT * FROM users WHERE email = \"" + req.body + "\";");
-		*db << get_user;
+		std::list<json> result = *db << Query("SELECT * FROM users WHERE email = \"" + req.body + "\";");
 
-		if(get_user -> result.size() == 0) {
+		if(result.size() == 0) {
 			res.set_content("NOT REGISTERED", "text/plain");
 		} else {
-			//json j_vec(get_user -> result);
-			res.set_content(get_user -> result.front().dump(), "application/json");
+			res.set_content(result.front().dump(), "application/json");
 		}
 
-		delete(get_user);
 	});
 
 	//list the current emergencies, possibly with a given selector
 	app.get("/emergency/list", [&](const auto& req, auto& res){
-		Query* get_emergencies = new Query("SELECT * FROM emergencies ORDER BY id DESC;");
-		*db << get_emergencies;
-		json j_vec(get_emergencies -> result);
-		
+		json j_vec(*db << Query("SELECT * FROM emergencies ORDER BY id DESC;"));		
 		res.set_content(j_vec.dump(), "application/json");
-
-		// delete(get_emergencies);
 	});
 
 	// submits an emergency report, it will need to be verified
@@ -242,20 +221,16 @@ int main() {
 		Query* submit_report;
 
 		if(latitude == "" || longitude == ""){
-			submit_report = new Query("INSERT INTO reports (type, description, status) VALUES (\"" + type + "\", \"" + description + "\", \"UNVERIFIED\");");
+			*db << Query("INSERT INTO reports (type, description, status) VALUES (\"" + type + "\", \"" + description + "\", \"UNVERIFIED\");");
 		} else {
-			submit_report = new 	Query("INSERT INTO reports (type, description, status, latitude, longitude)"
-									+ std::string("VALUES (\"" + type + "\", \"" + description + "\", \"" + "UNVERIFIED" + "\", \"") 
-									+ latitude + "\", \"" + longitude + "\");");
+			*db << Query("INSERT INTO reports (type, description, status, latitude, longitude)"
+					+ std::string("VALUES (\"" + type + "\", \"" + description + "\", \"" + "UNVERIFIED" + "\", \"") 
+					+ latitude + "\", \"" + longitude + "\");");
 		}
 
-		*db << submit_report;
-
 		reply["STATUS"] = "SUCCESS";
-
 		res.set_content(reply.dump(), "application/json");
 
-		delete(submit_report);
 	});
 
 	app.get("/emergency/unverified", [&](const auto& req, auto& res){
@@ -275,14 +250,11 @@ int main() {
 		}
 
 		// if the user is authorized, proceed with the data
-		Query* get_reports = new Query("SELECT * FROM reports WHERE status = \"UNVERIFIED\" ORDER BY time;");
-		*db << get_reports;
-
-		reply = get_reports -> result;
+		json j_vec(*db << Query("SELECT * FROM reports WHERE status = \"UNVERIFIED\" ORDER BY time;"));
+		reply = j_vec;
 
 		res.set_content(reply.dump(), "application/json");
 
-		delete(get_reports);
 	});
 
 	app.post("/emergency/verify", [&](const auto& req, auto& res){
@@ -311,17 +283,13 @@ int main() {
 			return;
 		}
 
-		Query* get_report = new Query("SELECT * FROM reports WHERE id=" + id + ";");
-		*db << get_report;
-		json report = get_report -> result.front();
+		json report = (*db << Query("SELECT * FROM reports WHERE id=" + id + ";")).front();
 
 		if(action == "DENY") {
-			Query* deny_report = new Query("UPDATE reports SET status = \"DENIED\" WHERE id = " + id + ";");
-			*db << deny_report;
+			*db << Query("UPDATE reports SET status = \"DENIED\" WHERE id = " + id + ";");
 			reply["STATUS"] = "SUCCESS";
 		} else if(action == "PERMIT") {
-			Query* permit_report = new Query("UPDATE reports SET status = \"PERMITTED\" WHERE id = " + id + ";");
-			*db << permit_report;
+			*db << Query("UPDATE reports SET status = \"PERMITTED\" WHERE id = " + id + ";");
 			reply["STATUS"] = "SUCCESS";
 
 			std::string type;
@@ -345,15 +313,11 @@ int main() {
 			}
 
 			// add report to emergency
-			Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES (\"" + type + "\", \"" + latitude + "\", \"" + longitude + "\", \"ACTIVE\", \"" + description + "\");");
-			*db << add_emergency;
-
-			delete(add_emergency);
+			*db << Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES (\"" + type + "\", \"" + latitude + "\", \"" + longitude + "\", \"ACTIVE\", \"" + description + "\");");
 		}
 
 		res.set_content(reply.dump(), "application/json");
 
-		delete(get_report);
 	});
 
 	app.post("/emergency/info", [&](const auto& req, auto& res){
@@ -372,14 +336,8 @@ int main() {
 			return;
 		}
 
-		Query* get_chat = new Query("SELECT * FROM chat ORDER BY time DESC;");
-		*db << get_chat;
-
-		json j_vec(get_chat -> result);
-
+		json j_vec(*db << Query("SELECT * FROM chat ORDER BY time DESC;"));
 		res.set_content(j_vec.dump(), "/application/json");
-
-		delete(get_chat);
 	});
 
 	app.post("/chat/post", [&](const auto& req, auto& res){
@@ -412,10 +370,7 @@ int main() {
 			return;
 		}
 
-		Query* post_message = new Query("INSERT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\"); ORDER BY ");
-		*db << post_message;
-
-		delete(post_message);
+		*db << Query("INSERT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\"); ORDER BY ");
 
 		reply["STATUS"] = "SUCCESS";
 		res.set_content(reply.dump(), "application/json");
