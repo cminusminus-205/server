@@ -61,7 +61,7 @@ std::string get_privileges(httplib::Headers headers){
 
 int main() {
 	//open a connection to our database
-	db = new Database("/Users/connorwiniarczyk/server/data.db");
+	db = new Database("/root/server/data.db");
 
 	db -> wipe();
 
