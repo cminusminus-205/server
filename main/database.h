@@ -88,7 +88,11 @@ public:
 		// the dase should always have a god user
 		*this << Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('god@user.com', 'god', 'password', 'GOD');");
 		*this << Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('test@test.com', 'public', 'password', 'PUBLIC');");
-		*this << Query("INSERT INTO users (email, first_name, password_hash, privileges) VALUES ('firstresponder@test.com', 'first', 'password', 'FIRST RESPONDER');");
+		*this << Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ('connor@user.com', 'Connor', 'Winiarczyk', 'password', 'FIRST RESPONDER');");
+		*this << Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ('angela@user.com', 'Angela', 'Shi', 'password', 'FIRST RESPONDER');");
+		*this << Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ('feng@user.com', 'Feng', 'Qiu', 'password', 'FIRST RESPONDER');");
+		*this << Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ('kerry@user.com', 'Kerry', 'Stranick', 'password', 'FIRST RESPONDER');");
+
 
 		*this << Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES ('TEST', '40.699190', '-75.211171', 'ACTIVE', 'Test, please ignore');");
 
