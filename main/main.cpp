@@ -82,10 +82,8 @@ int main() {
 		json j_vec(query -> result);
 
 		res.set_content(j_vec.dump(4), "text/plain");
-	});
 
-	app.post("/data/add_user", [&](const auto& req, auto& res){
-		res.set_content("Post!", "text/plain");
+		delete(query);
 	});
 
 	app.post("/user/login", [&](const auto& req, auto& res){
@@ -119,6 +117,8 @@ int main() {
 			}
 
 			res.set_content(reply.dump(), "application/json");
+
+			delete(query);
 
 		} catch(const nlohmann::detail::type_error e) {
 			res.set_content("ERROR: invalid request", "text/plain");
@@ -162,6 +162,8 @@ int main() {
 		} else {
 			res.set_content("email already registered", "text/plain");
 		}
+
+		delete(check_if_exists);
 	});
 
 	// fetches info on the user with the given email and returns it
@@ -175,6 +177,8 @@ int main() {
 			//json j_vec(get_user -> result);
 			res.set_content(get_user -> result.front().dump(), "application/json");
 		}
+
+		delete(get_user);
 	});
 
 	//list the current emergencies, possibly with a given selector
@@ -184,6 +188,8 @@ int main() {
 		json j_vec(get_emergencies -> result);
 		
 		res.set_content(j_vec.dump(), "application/json");
+
+		delete(get_emergencies);
 	});
 
 	// submits an emergency report, it will need to be verified
@@ -248,6 +254,8 @@ int main() {
 		reply["STATUS"] = "SUCCESS";
 
 		res.set_content(reply.dump(), "application/json");
+
+		delete(submit_report);
 	});
 
 	app.get("/emergency/unverified", [&](const auto& req, auto& res){
@@ -273,6 +281,8 @@ int main() {
 		reply = get_reports -> result;
 
 		res.set_content(reply.dump(), "application/json");
+
+		delete(get_reports);
 	});
 
 	app.post("/emergency/verify", [&](const auto& req, auto& res){
@@ -337,11 +347,13 @@ int main() {
 			// add report to emergency
 			Query* add_emergency = new Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES (\"" + type + "\", \"" + latitude + "\", \"" + longitude + "\", \"ACTIVE\", \"" + description + "\");");
 			*db << add_emergency;
+
+			delete(add_emergency);
 		}
 
 		res.set_content(reply.dump(), "application/json");
 
-		// add_emergency();
+		delete(get_report);
 	});
 
 	app.post("/emergency/info", [&](const auto& req, auto& res){
@@ -366,6 +378,8 @@ int main() {
 		json j_vec(get_chat -> result);
 
 		res.set_content(j_vec.dump(), "/application/json");
+
+		delete(get_chat);
 	});
 
 	app.post("/chat/post", [&](const auto& req, auto& res){
@@ -400,6 +414,8 @@ int main() {
 
 		Query* post_message = new Query("INSERT INTO chat (sent_by, message) VALUES (\"" + email + "\", \"" + message + "\"); ORDER BY ");
 		*db << post_message;
+
+		delete(post_message);
 
 		reply["STATUS"] = "SUCCESS";
 		res.set_content(reply.dump(), "application/json");
