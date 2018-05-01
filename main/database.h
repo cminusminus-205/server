@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 #include <list>
 #include <vector>
+#include <algorithm>
 #include <sstream>
 #include <iostream>
 #include <map>
@@ -72,7 +73,11 @@ public:
 		operation_queue.front() -> result = output;
 
 		//remove this query from the queue
-		if(!operation_queue.empty()) operation_queue.pop_front();	
+		if(!operation_queue.empty()) {
+			Query* operation = operation_queue.front();
+			operation_queue.pop_front();
+			delete(operation);
+		}
 	}
 
 	// wipes the database
