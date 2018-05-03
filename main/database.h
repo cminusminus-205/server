@@ -94,7 +94,7 @@ public:
 		*this << Query("INSERT INTO users (email, first_name, last_name, password_hash, privileges) VALUES ('kerry@user.com', 'Kerry', 'Stranick', 'password', 'FIRST RESPONDER');");
 
 
-		*this << Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES ('TEST', '40.699190', '-75.211171', 'ACTIVE', 'Test, please ignore');");
+		//*this << Query("INSERT INTO emergencies (type, latitude, longitude, status, description) VALUES ('TEST', '40.699190', '-75.211171', 'ACTIVE', 'Test, please ignore');");
 
 	}
 
