@@ -223,9 +223,9 @@ int main() {
 		if(latitude == "" || longitude == ""){
 			*db << Query("INSERT INTO reports (type, description, status) VALUES (\"" + type + "\", \"" + description + "\", \"UNVERIFIED\");");
 		} else {
-			*db << Query("INSERT INTO reports (type, description, status, latitude, longitude)"
+			*db << Query("INSERT INTO reports (type, description, status, latitude, longitude, sent_by, sent_by_type)"
 					+ std::string("VALUES (\"" + type + "\", \"" + description + "\", \"" + "UNVERIFIED" + "\", \"") 
-					+ latitude + "\", \"" + longitude + "\");");
+					+ latitude + "\", \"" + longitude + "\", \"" + get_email(req.headers) + "\", \"" + get_privileges(req.headers) + "\");");
 		}
 
 		reply["STATUS"] = "SUCCESS";
