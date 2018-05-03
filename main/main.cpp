@@ -221,7 +221,7 @@ int main() {
 		Query* submit_report;
 
 		if(latitude == "" || longitude == ""){
-			*db << Query("INSERT INTO reports (type, description, status) VALUES (\"" + type + "\", \"" + description + "\", \"UNVERIFIED\");");
+			*db << Query("INSERT INTO reports (type, description, status, sent_by, sent_by_type) VALUES (\"" + type + "\", \"" + description + "\", \"UNVERIFIED\", \"" + get_email(req.headers) + "\", \"" + get_privileges(req.headers) + "\");");
 		} else {
 			*db << Query("INSERT INTO reports (type, description, status, latitude, longitude, sent_by, sent_by_type)"
 					+ std::string("VALUES (\"" + type + "\", \"" + description + "\", \"" + "UNVERIFIED" + "\", \"") 
